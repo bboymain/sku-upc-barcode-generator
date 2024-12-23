@@ -37,12 +37,6 @@
             margin-bottom: 1rem;
             position: relative;
         }
-        .input-group label {
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            display: block;
-            width: 100%;
-        }
         .input-group input {
             padding: 10px;
             font-size: 1rem;
@@ -67,14 +61,15 @@
             background-color: #0056b3;
         }
         button {
-            padding: 10px;
+            padding: 12px;
             background-color: #007bff;
             color: #fff;
             border: none;
             border-radius: 5px;
             font-size: 1rem;
             cursor: pointer;
-      
+            margin-top: 1rem;
+            width: 100%;
         }
         button:hover {
             background-color: #0056b3;
@@ -127,7 +122,7 @@
 
             try {
                 // Send a POST request to the server
-                const response = await fetch('/fetchSkuUpc', {
+                const response = await fetch('/api/fetchSkuUpc', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }, // Tell server it's JSON
                     body: JSON.stringify({ url }), // Send the Walmart URL in the request body
