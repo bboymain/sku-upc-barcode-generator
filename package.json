@@ -1,0 +1,17 @@
+{
+    "name": "walmart-barcode-app",
+    "version": "1.0.0",
+    "main": "server.js",
+    "type": "module",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "express": "^4.21.2",
+        "jsdom": "^21.1.0",
+        "node-fetch": "^3.3.2",
+        "puppeteer": "^23.11.1",
+        "puppeteer-extra": "^3.3.6",
+        "puppeteer-extra-plugin-stealth": "^2.11.2"
+    }
+}

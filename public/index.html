@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKU & UPC Barcode Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode/dist/JsBarcode.all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+        .container {
+            width: 90%;
+            max-width: 500px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .input-group label {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            width: 100%;
+        }
+        .input-group input {
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+            flex: 1;
+        }
+        .input-group input:focus {
+            border-color: #007bff;
+        }
+        .paste-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .paste-button:hover {
+            background-color: #0056b3;
+        }
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+      
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .result p {
+            margin: 10px 0;
+            font-size: 1rem;
+            color: #333;
+        }
+        svg {
+            margin-top: 10px;
+        }
+        footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #aaa;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SKU & UPC Barcode Generator</h1>
+        <div class="input-group">
+            <input type="text" id="walmartUrl" placeholder="Paste Walmart product URL here">
+            <button class="paste-button" onclick="pasteUrl()">Paste</button>
+        </div>
+        <button onclick="generateBarcodes()">Generate Barcodes</button>
+        <div id="result" class="result">
+            <p><strong>SKU:</strong> <span id="sku"></span></p>
+            <svg id="skuBarcode"></svg>
+            <p><strong>UPC:</strong> <span id="upc"></span></p>
+            <svg id="upcBarcode"></svg>
+        </div>
+    </div>
+    <footer>
+        Made with ❤️ for Walmart SKU & UPC Barcodes
+    </footer>
+
+    <script>
+        async function generateBarcodes() {
+            console.log("generateBarcodes function is running");
+            const url = document.getElementById('walmartUrl').value; // Get the Walmart URL from the input field
+            const resultDiv = document.getElementById('result'); // Where results will be displayed
+            resultDiv.innerHTML = '<p>Fetching data...</p>'; // Show a loading message
+
+            try {
+                // Send a POST request to the server
+                const response = await fetch('/fetchSkuUpc', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }, // Tell server it's JSON
+                    body: JSON.stringify({ url }), // Send the Walmart URL in the request body
+                });
+
+                // Check if the response is OK
+                if (!response.ok) {
+                    throw new Error('Failed to fetch SKU and UPC.');
+                }
+
+                const data = await response.json(); // Parse the server's response
+
+                // Display the results (SKU and UPC)
+                if (data.sku && data.upc) {
+                    resultDiv.innerHTML = `
+                        <p><strong>SKU:</strong> ${data.sku}</p>
+                        <svg id="skuBarcode"></svg>
+                        <p><strong>UPC:</strong> ${data.upc}</p>
+                        <svg id="upcBarcode"></svg>
+                    `;
+
+                    // Generate the barcodes using JsBarcode
+                    JsBarcode('#skuBarcode', data.sku, { format: 'CODE128' });
+                    JsBarcode('#upcBarcode', data.upc, { format: 'UPC' });
+                } else {
+                    resultDiv.innerHTML = '<p>Error: SKU or UPC not found.</p>';
+                }
+            } catch (error) {
+                console.error(error); // Log any errors
+                resultDiv.innerHTML = '<p>Error fetching details. Please check the URL.</p>';
+            }
+        }
+
+        function pasteUrl() {
+            navigator.clipboard.readText()
+                .then(text => {
+                    document.getElementById('walmartUrl').value = text;
+                })
+                .catch(err => {
+                    console.error('Failed to read clipboard contents: ', err);
+                });
+        }
+    </script>
+</body>
+</html>
